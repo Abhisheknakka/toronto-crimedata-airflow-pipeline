@@ -1,6 +1,7 @@
 # toronto-crimedata-airflow-pipeline
 This is a etl pipeline built to extract crime data from open.toronto.ca site and perform analysis on postgres 
 
+data source : https://open.toronto.ca/dataset/neighbourhood-crime-rates/
 
 pre requisites: docker installed
 step 1: create a virtual environment and install necessary libraries
@@ -9,6 +10,8 @@ step 1: create a virtual environment and install necessary libraries
 python -m venv venv
 venv/Scripts/Activate
 pip install apache-airflow pandas requests psycopg2
+pip install apache-airflow-providers-postgres
+
 ```
 
 step 2: Initialize git
@@ -111,4 +114,26 @@ and then
 
 
 you will be able to login to pgadmin.
-```localhost:5432````
+```localhost:5050````
+
+id and password is in the docker yaml file
+user id: server@***
+pssword: ro**
+
+once you login, you create a new server and add your postgres in pgadmin
+
+
+add the connection details in airflow connections
+
+make sure to add the connection  name in script correctly
+
+
+
+Results:
+DAG Output
+![alt text](image-2.png)
+
+Postgres
+
+![alt text](image-3.png)
+
