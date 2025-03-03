@@ -1,10 +1,21 @@
 # toronto-crimedata-airflow-pipeline
-This is a etl pipeline built to extract crime data from open.toronto.ca site and perform analysis on postgres 
+I’ve built an ETL pipeline to extract crime data from the Toronto Neighbourhood Crime Rates dataset on open.toronto.ca and analyze it using PostgreSQL.
 
 data source : https://open.toronto.ca/dataset/neighbourhood-crime-rates/
 
-pre requisites: docker installed
-step 1: create a virtual environment and install necessary libraries
+![alt text](image-4.png)
+
+# Project Overview
+This project automates the process of pulling crime data, transforming it as needed, and loading it into a PostgreSQL database. It’s powered by Apache Airflow for managing the pipeline workflows.
+
+Here’s a quick guide on how to get this running and how the pipeline is set up.
+
+# Prerequisites
+- Docker installed
+- Python 3.7+
+- Basic knowledge of Git, Airflow, and PostgreSQL
+
+# Step 1: Set Up Your Virtual Environment
 
 ```
 python -m venv venv
@@ -14,7 +25,7 @@ pip install apache-airflow-providers-postgres
 
 ```
 
-step 2: Initialize git
+# Step 2: Initialize Git Repository
 
 Create a git repository and make sure add .gitignore file to add all the files which are not required to push to  git repo
 
@@ -27,7 +38,6 @@ echo "venv/
 __pycache__/
 airflow.cfg
 logs/
-dags/
 .env" > .gitignore
 ```
 
@@ -39,7 +49,7 @@ git branch -M main
 git push -u origin main
 ```
 
-if someone who wants to start from my repo, then just clone my repository 
+If you’d like to start from my repo, simply clone it with, although i dont prefer this as i havent uplaoded confidential data :
 
 ```
 git clone https://github.com/Abhisheknakka/toronto-crimedata-airflow-pipeline
@@ -47,7 +57,7 @@ git clone https://github.com/Abhisheknakka/toronto-crimedata-airflow-pipeline
 
 
 
-Step 3: Set Up Airflow, PostgreSQL, and Docker
+# Step 3: Set Up Airflow, PostgreSQL, and Docker
 
 Head over to [Running airflow on docker](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html)
 
@@ -85,7 +95,7 @@ user id and password both "airflow"
 
 now login and time to setup next big thing
 
-Step 4: Setting up database POSTGRES on docker
+# Step 4: Setting Up PostgreSQL Database in Docker
 
 1. go to docker-compose.yaml  file
 
@@ -116,24 +126,60 @@ and then
 you will be able to login to pgadmin.
 ```localhost:5050````
 
-id and password is in the docker yaml file
-user id: server@***
-pssword: ro**
+You can now log in to pgAdmin via http://localhost:5050.
 
-once you login, you create a new server and add your postgres in pgadmin
+Username: server@admin.com
+Password: root
+
+After logging in, create a new server connection and add your PostgreSQL details.
 
 
-add the connection details in airflow connections
+
+# Step 5: Connect Airflow to PostgreSQL
+In Airflow, navigate to Admin > Connections and add the PostgreSQL connection details with the correct name as specified in your script.
+![alt text](image-5.png)
 
 make sure to add the connection  name in script correctly
 
 
 
-Results:
-DAG Output
+# Results
+Once everything is set up, you’ll see the output of your ETL pipeline in Airflow's UI. Here’s a look at the results:
+
+DAG Output:
 ![alt text](image-2.png)
 
 Postgres
 
 ![alt text](image-3.png)
 
+# Conclusion
+With Airflow, Docker, and PostgreSQL, you can automate the process of extracting, transforming, and loading (ETL) data seamlessly. The power of Apache Airflow lies in its scalability, flexibility, and observability—making it the perfect tool for handling complex data workflows.
+
+Feel free to clone the repository and try it out for yourself!
+
+# My key learnings / observations while debugging errors
+
+1. Error 1: Undefined Column Error (column "area_name" does not exist)
+Cause:
+The column AREA_NAME in your SQL query does not match the column name in the database, either in terms of case sensitivity or exact spelling.
+
+Solution:
+Ensure that the column names in the SQL query match exactly with those in the database schema. In PostgreSQL, column names are case-sensitive if enclosed in quotes (" "). To ensure consistency, create the table with column names in uppercase (or lowercase, if preferred) and use the exact case when writing queries.
+
+2. Error 2: Duplicate Key Error while running DAGs multiple times (duplicate key value violates unique constraint)
+Cause:
+You are trying to insert a record with a duplicate _id value. The _id column is the primary key in your table, so it must be unique.
+
+Solution:
+
+Skip duplicate records: You can use the ON CONFLICT clause in PostgreSQL to skip inserting duplicate values.
+
+3. Error: Table Does Not Exist (relation "toronto_crime_data" does not exist)
+
+Cause:
+The error occurs when you try to execute an INSERT query or any other SQL operation (like SELECT, UPDATE, etc.) on a table that does not exist in the database. This usually happens when:
+
+Solution: 
+
+CREATE TABLE IF NOT EXISTS toronto_crime_data ()
